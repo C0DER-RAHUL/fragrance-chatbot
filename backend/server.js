@@ -665,8 +665,9 @@ const safeLoadJSON = (filePath, fallbackValue = []) => {
     }
 };
 
-const websiteEmbeddings = safeLoadJSON("./knowledge/embeddings.json");
-const productEmbeddings = safeLoadJSON("./knowledge/productEmbeddings.json");
+// Use path.join and process.cwd() to find the absolute path
+const websiteEmbeddings = safeLoadJSON(path.join(process.cwd(), "knowledge", "embeddings.json"));
+const productEmbeddings = safeLoadJSON(path.join(process.cwd(), "knowledge", "productEmbeddings.json"));
 
 /* ====================================
     SESSION STORAGE
