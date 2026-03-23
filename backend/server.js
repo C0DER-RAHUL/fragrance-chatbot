@@ -646,13 +646,26 @@ function getUserProfile(userId){
    LOAD KNOWLEDGE
 ============================= */
 
-const websiteEmbeddings = JSON.parse(
-  fs.readFileSync("./knowledge/embeddings.json","utf8")
-)
+ import fs from 'fs';
+import path from 'path';
 
-const productEmbeddings = JSON.parse(
-  fs.readFileSync("./knowledge/productEmbeddings.json","utf8")
-)
+// Helper function to safely load JSON
+const loadJSON = (fileName) => {
+  const filePath = path.join(process.cwd(), 'knowledge', fileName);
+  if (fs.existsSync(filePath)) {
+    try {
+      return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    } catch (err) {
+      console.error(`Error parsing ${fileName}:`, err);
+      return [];
+    }
+  }
+  console.warn(`⚠️ ${fileName} not found. Initializing with empty array.`);
+  return [];
+};
+
+const websiteEmbeddings = loadJSON('embeddings.json');
+const productEmbeddings = loadJSON('productEmbeddings.json');
 
 /* =============================
    SESSION STORAGE
