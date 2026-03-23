@@ -6,8 +6,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "node embedSite.js && node embedProducts.js",
-  "start": "node server.js"
+    "build": "mkdir -p knowledge && curl -L -o ./knowledge/embeddings.json 'https://docs.google.com/uc?export=download&id=11Gr3XVM0F2KqC3ReQF6K8htr-6hw4KG3' && node embedSite.js && node embedProducts.js",
+    "start": "node server.js"
   },
   "keywords": [],
   "author": "",
