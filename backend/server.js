@@ -646,26 +646,31 @@ function getUserProfile(userId){
    LOAD KNOWLEDGE
 ============================= */
 
- import fs from 'fs';
-import path from 'path';
+  /* ====================================
+    LOAD KNOWLEDGE
+==================================== */
 
-// Helper function to safely load JSON
-const loadJSON = (fileName) => {
-  const filePath = path.join(process.cwd(), 'knowledge', fileName);
-  if (fs.existsSync(filePath)) {
+// Helper to safely load JSON without crashing the server
+const safeLoadJSON = (filePath, fallbackValue = []) => {
     try {
-      return JSON.parse(fs.readFileSync(filePath, 'utf8'));
-    } catch (err) {
-      console.error(`Error parsing ${fileName}:`, err);
-      return [];
+        if (fs.existsSync(filePath)) {
+            return JSON.parse(fs.readFileSync(filePath, "utf8"));
+        } else {
+            console.warn(`⚠️ Warning: ${filePath} not found. Using empty data.`);
+            return fallbackValue;
+        }
+    } catch (error) {
+        console.error(`❌ Error reading ${filePath}:`, error);
+        return fallbackValue;
     }
-  }
-  console.warn(`⚠️ ${fileName} not found. Initializing with empty array.`);
-  return [];
 };
 
-const websiteEmbeddings = loadJSON('embeddings.json');
-const productEmbeddings = loadJSON('productEmbeddings.json');
+const websiteEmbeddings = safeLoadJSON("./knowledge/embeddings.json");
+const productEmbeddings = safeLoadJSON("./knowledge/productEmbeddings.json");
+
+/* ====================================
+    SESSION STORAGE
+==================================== */
 
 /* =============================
    SESSION STORAGE
