@@ -592,6 +592,7 @@ import dotenv from "dotenv"
 import OpenAI from "openai"
 import fs from "fs"
 import similarity from "compute-cosine-similarity"
+import path from 'path'; // <--- Make sure this line exists!
 
 dotenv.config()
 
@@ -665,9 +666,13 @@ const safeLoadJSON = (filePath, fallbackValue = []) => {
     }
 };
 
-// Use path.join and process.cwd() to find the absolute path
-const websiteEmbeddings = safeLoadJSON(path.join(process.cwd(), "knowledge", "embeddings.json"));
-const productEmbeddings = safeLoadJSON(path.join(process.cwd(), "knowledge", "productEmbeddings.json"));
+const websiteEmbeddingsPath = path.join(process.cwd(), "knowledge", "embeddings.json");
+const productEmbeddingsPath = path.join(process.cwd(), "knowledge", "productEmbeddings.json");
+
+console.log("🔍 Looking for embeddings at:", websiteEmbeddingsPath);
+
+const websiteEmbeddings = safeLoadJSON(websiteEmbeddingsPath);
+const productEmbeddings = safeLoadJSON(productEmbeddingsPath);
 
 /* ====================================
     SESSION STORAGE
