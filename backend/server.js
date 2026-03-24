@@ -924,11 +924,10 @@ app.post("/chat", async(req,res)=>{
     const context =
       contextChunks.map(c=>c.text).join("\n")
 
-    if(contextScore < 0.15){
-      return res.json({
-        reply:"I couldn't find that information on the Adirondack Fragrance website.",
-        products:[]
-      })
+    // Change 0.15 to 0.05 so it's less strict
+    if(contextScore < 0.05){
+      // Instead of stopping the code, we just log it and let the AI try anyway
+      console.log("Low context score for message:", userMessage);
     }
 
     const candidateProducts =
