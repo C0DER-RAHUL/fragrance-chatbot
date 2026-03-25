@@ -1004,10 +1004,18 @@ Conversation Style
 - Be friendly, professional, and concise.
 - Write like a helpful store associate in a boutique fragrance shop.
 - Avoid robotic or technical language.
+- Use emojis occasionally to be warm and friendly.
 
 Accuracy
 - Only use the website knowledge and provided product list.
 - If unsure, politely say you do not know rather than guessing.
+
+Suggested Follow-Up Questions
+- At the very end of EVERY response, you MUST include exactly one line starting with "SUGGESTED:" followed by 2-3 short follow-up questions the customer might want to ask next, separated by | character.
+- Example: SUGGESTED: What scents do you have for summer? | Do you offer gift sets? | What's your return policy?
+- The suggested questions should be relevant to the conversation context and feel natural.
+- Keep each question short (under 10 words).
+- This SUGGESTED line must always be the very last line of your response.
 
 Website Knowledge:
 ${context}
@@ -1023,6 +1031,18 @@ ${productContext}`
     let reply =
       completion.choices[0].message.content
 
+    // Parse suggested questions from the response
+    let suggestedQuestions = []
+    const suggestedMatch = reply.match(/SUGGESTED:\s*(.+)$/im)
+    if(suggestedMatch){
+      suggestedQuestions = suggestedMatch[1]
+        .split("|")
+        .map(q => q.trim())
+        .filter(q => q.length > 0)
+      // Remove the SUGGESTED line from the reply
+      reply = reply.replace(/\n?SUGGESTED:\s*(.+)$/im, "").trim()
+    }
+
     sessionHistory.push({
       role:"assistant",
       content:reply
@@ -1030,6 +1050,7 @@ ${productContext}`
 
     res.json({
       reply,
+      suggestedQuestions,
       products:recommendedProducts.map(p=>({
         name:p.name,
         image:p.image,
