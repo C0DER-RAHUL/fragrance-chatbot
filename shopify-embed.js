@@ -12,7 +12,7 @@
 (function () {
   // ─── Configuration ─────────────────────────────────────
   // Replace this with your deployed frontend URL (Vercel/Netlify)
-  const CHATBOT_URL = "https://YOUR-VERCEL-URL.vercel.app";
+  const CHATBOT_URL = "https://vartta-ai.netlify.app/";
 
   // ─── Prevent double-loading ────────────────────────────
   if (window.__fragranceChatbotLoaded) return;
