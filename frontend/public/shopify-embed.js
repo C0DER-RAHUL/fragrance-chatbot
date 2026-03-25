@@ -47,6 +47,49 @@
     iframe.style.pointerEvents = "auto";
   });
 
+  // ─── PostMessage Listener for Add to Cart ────────────────
+  window.addEventListener("message", async (event) => {
+    // Basic security check (allow any origin for now, but check structure)
+    if (!event.data || typeof event.data !== "object") return;
+
+    if (event.data.type === "FRAGRANCE_ADD_TO_CART" && event.data.url) {
+      try {
+        // 1. Fetch the product page quietly
+        const res = await fetch(event.data.url);
+        const html = await res.text();
+        
+        // 2. Parse the HTML to find the Variant ID
+        const doc = new DOMParser().parseFromString(html, "text/html");
+        
+        // Find the variant ID in the add to cart form
+        const idInput = doc.querySelector('form[action*="/cart/add"] [name="id"], input[name="id"]');
+        if (!idInput || !idInput.value) {
+          console.error("Fragrance AI: Could not find variant ID on product page.");
+          alert("Couldn't add to cart automatically. Please click 'View' to add it manually.");
+          return;
+        }
+
+        const variantId = idInput.value;
+
+        // 3. Call Shopify's AJAX Cart API
+        await fetch(window.Shopify?.routes?.root + "cart/add.js" || "/cart/add.js", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            items: [{ id: parseInt(variantId), quantity: 1 }]
+          })
+        });
+
+        // 4. Redirect to cart or trigger theme cart drawer
+        // (Redirecting to cart is the safest universal method for all Shopify themes)
+        window.location.href = "/cart";
+
+      } catch (err) {
+        console.error("Fragrance AI: Cart error", err);
+      }
+    }
+  });
+
   // ─── Responsive: full screen on mobile ─────────────────
   function applyResponsive() {
     if (window.innerWidth <= 480) {

@@ -95,6 +95,29 @@ function App() {
     }
   }, [messages]);
 
+  // ─── Sound Effect ───────────────────────────────────────
+  const playSendSound = () => {
+    try {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContext) return;
+      const ctx = new AudioContext();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = "sine";
+      // A pleasant "pop" sound frequency curve
+      osc.frequency.setValueAtTime(600, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(150, ctx.currentTime + 0.1);
+      gain.gain.setValueAtTime(0.3, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.1);
+    } catch (e) {
+      console.warn("Audio play blocked or failed", e);
+    }
+  };
+
   // ─── Toggle Widget ──────────────────────────────────────
   const toggleWidget = () => {
     if (isOpen) {
@@ -117,6 +140,9 @@ function App() {
     setMessages(prev => [...prev, userMessage]);
     setInput("");
     setIsTyping(true);
+    
+    // Play sound!
+    playSendSound();
 
     try {
       const response = await fetch(`${API_URL}/chat`, {
@@ -308,14 +334,40 @@ function App() {
                         <div className="product-card-name">{p.name}</div>
                         {p.price && <div className="product-card-price">${p.price}</div>}
                         {p.url && (
-                          <a
-                            href={p.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="product-card-link"
-                          >
-                            View
-                          </a>
+                          <div className="product-card-actions" style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
+                            <button
+                              className="add-to-cart-btn"
+                              onClick={(e) => {
+                                e.target.innerText = "Adding...";
+                                e.target.style.opacity = "0.7";
+                                window.parent.postMessage({ type: "FRAGRANCE_ADD_TO_CART", url: p.url }, "*");
+                                setTimeout(() => {
+                                  e.target.innerText = "Added ✓";
+                                  e.target.style.background = "#2e7d32";
+                                  e.target.style.color = "white";
+                                  e.target.style.opacity = "1";
+                                }, 1500);
+                              }}
+                              style={{
+                                flex: 1, backgroundColor: 'black', color: 'white', border: 'none', 
+                                padding: '8px', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', fontWeight: '500', transition: '0.2s'
+                              }}
+                            >
+                              Add to Cart
+                            </button>
+                            <a
+                              href={p.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="product-card-link"
+                              style={{
+                                padding: '8px 12px', border: '1px solid #ddd', borderRadius: '6px', 
+                                color: '#333', textDecoration: 'none', fontSize: '13px', display: 'flex', alignItems: 'center'
+                              }}
+                            >
+                              View
+                            </a>
+                          </div>
                         )}
                       </div>
                     ))}
