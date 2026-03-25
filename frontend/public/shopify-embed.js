@@ -12,7 +12,11 @@
 (function () {
   // ─── Configuration ─────────────────────────────────────
   // Replace this with your deployed frontend URL (Vercel/Netlify)
+<<<<<<< HEAD:frontend/public/shopify-embed.js
   const CHATBOT_URL = "https://vartta-ai.netlify.app";
+=======
+  const CHATBOT_URL = "https://vartta-ai.netlify.app/";
+>>>>>>> bcf2395695afbc0b9d493bacbc7dfdf01ee360f0:shopify-embed.js
 
   // ─── Prevent double-loading ────────────────────────────
   if (window.__fragranceChatbotLoaded) return;
